@@ -1,11 +1,6 @@
 <template>
   <section class="map_display">
-    <GoogleMap
-      id="map"
-      api-key="AIzaSyBM9JvtK7P0KmJyYPxtZ5L6C52DheakpXQ"
-      :center="newLocation"
-      :zoom="15"
-    >
+    <GoogleMap id="map" :api-key="apiKey" :center="newLocation" :zoom="15">
       <Marker :options="{ position: newLocation }" />
     </GoogleMap>
   </section>
@@ -16,7 +11,7 @@ import { GoogleMap, Marker } from "vue3-google-map";
 
 export default {
   components: { GoogleMap, Marker },
-  inject: ["newLocation"],
+  inject: ["newLocation", "apiKey"],
   data() {
     return {};
   },

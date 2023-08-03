@@ -20,6 +20,7 @@ export default {
   data() {
     return {
       location: { lat: 0, lng: 0 },
+      key: process.env.VUE_APP_GOOGLE_MAP_API_KEY,
     };
   },
 
@@ -27,6 +28,7 @@ export default {
     return {
       // need to call computed() and wrap your data in it so that the child component injecting this will react to changes
       newLocation: computed(() => this.location),
+      apiKey: computed(() => this.key),
     };
   },
 
