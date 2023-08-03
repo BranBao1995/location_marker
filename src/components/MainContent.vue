@@ -1,7 +1,7 @@
 <template>
   <section class="main">
-    <location-results></location-results>
-    <map-display></map-display>
+    <LocationResults />
+    <MapDisplay />
   </section>
 </template>
 
@@ -13,9 +13,6 @@ export default {
   components: {
     LocationResults,
     MapDisplay,
-  },
-  data() {
-    return {};
   },
 };
 </script>

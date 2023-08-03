@@ -7,15 +7,36 @@
         placeholder="Search for a location"
       />
       <button class="search_button">Search</button>
-      <button class="search_button">Current Location</button>
+      <button
+        type="button"
+        class="search_button"
+        @click.prevent="currentLocation"
+      >
+        Current Location
+      </button>
     </form>
   </section>
 </template>
 
 <script>
 export default {
-  data() {
-    return {};
+  emits: ["get-location"],
+
+  methods: {
+    currentLocation() {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          this.$emit("get-location", location);
+        },
+        (error) => {
+          console.log(error.message);
+        }
+      );
+    },
   },
 };
 </script>

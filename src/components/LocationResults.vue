@@ -1,5 +1,5 @@
 <template>
-  <section class="main">
+  <section class="results">
     <h1>No results</h1>
   </section>
 </template>
@@ -13,7 +13,7 @@ export default {
 </script>
 
 <style scoped>
-.main {
-  width: 70%;
+.results {
+  width: 30%;
 }
 </style>

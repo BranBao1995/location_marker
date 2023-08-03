@@ -3,7 +3,7 @@ import App from "./App.vue";
 
 const app = createApp(App);
 
-// app.component("base-card", BaseCard);
-// app.component("base-button", BaseButton);
+// no longer needed for Vue 3.3 anymore
+// app.config.unwrapInjectedRef = true;
 
 app.mount("#app");
