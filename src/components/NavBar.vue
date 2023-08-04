@@ -1,23 +1,23 @@
 <template>
   <section class="navbar">
-    <form class="search_form">
+    <form @submit.prevent="getAddress" class="search_form">
       <input
         class="search_input"
         type="text"
         placeholder="Search for a location"
         v-model="address"
       />
-      <button type="button" class="search_button" @click.prevent="getAddress">
+      <button type="button" id="search_button" @click.prevent="getAddress">
         Search
       </button>
+      <button
+        type="button"
+        id="current_button"
+        @click.prevent="currentLocation"
+      >
+        Current Location
+      </button>
     </form>
-    <button
-      type="button"
-      class="search_button"
-      @click.prevent="currentLocation"
-    >
-      Current Location
-    </button>
   </section>
 </template>
 
@@ -33,10 +33,13 @@ export default {
 
   methods: {
     getAddress() {
+      console.log("getAddress is called!");
       this.$emit("get-address", this.address);
+      this.address = "";
     },
 
     currentLocation() {
+      console.log("currentLocation is called!");
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
@@ -49,6 +52,7 @@ export default {
           console.log(error.message);
         }
       );
+      this.address = "";
     },
   },
 };
@@ -64,19 +68,24 @@ export default {
 }
 
 .search_form {
-  width: 40%;
+  width: 60%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .search_input {
-  width: 80%;
+  width: 70%;
   height: 3rem;
 }
 
-.search_button {
-  width: 20%;
+#search_button {
+  width: 15%;
+  height: 3rem;
+}
+
+#current_button {
+  width: 15%;
   height: 3rem;
 }
 </style>

@@ -83,12 +83,6 @@ export default {
 
       console.log("locations array: " + this.locations);
       console.log("map center: " + this.center);
-
-      // const newLoc = { lat: newLocation.lat, lng: newLocation.lng };
-      // this.location = newLoc;
-
-      // console.log(this.location.lat);
-      // console.log(this.location.lng);
     },
   },
 };
