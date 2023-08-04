@@ -5,24 +5,37 @@
         class="search_input"
         type="text"
         placeholder="Search for a location"
+        v-model="address"
       />
-      <button class="search_button">Search</button>
-      <button
-        type="button"
-        class="search_button"
-        @click.prevent="currentLocation"
-      >
-        Current Location
+      <button type="button" class="search_button" @click.prevent="getAddress">
+        Search
       </button>
     </form>
+    <button
+      type="button"
+      class="search_button"
+      @click.prevent="currentLocation"
+    >
+      Current Location
+    </button>
   </section>
 </template>
 
 <script>
 export default {
-  emits: ["get-location"],
+  emits: ["current-location", "get-address"],
+
+  data() {
+    return {
+      address: "",
+    };
+  },
 
   methods: {
+    getAddress() {
+      this.$emit("get-address", this.address);
+    },
+
     currentLocation() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -30,7 +43,7 @@ export default {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          this.$emit("get-location", location);
+          this.$emit("current-location", location);
         },
         (error) => {
           console.log(error.message);

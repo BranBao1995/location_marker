@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavBar @get-location="setLocation" />
+    <NavBar @current-location="currentLocation" @get-address="setAddress" />
     <MainContent />
   </div>
 </template>
@@ -19,7 +19,9 @@ export default {
 
   data() {
     return {
-      location: { lat: 0, lng: 0 },
+      // location: { lat: 0, lng: 0 },
+      locations: [{ id: "0", center: { lat: 0, lng: 0 } }],
+      center: { lat: 0, lng: 0 },
       key: process.env.VUE_APP_GOOGLE_MAP_API_KEY,
     };
   },
@@ -27,23 +29,66 @@ export default {
   provide() {
     return {
       // need to call computed() and wrap your data in it so that the child component injecting this will react to changes
-      newLocation: computed(() => this.location),
+      locations: computed(() => this.locations),
+      center: computed(() => this.center),
+      // location: computed(() => this.location),
       apiKey: computed(() => this.key),
     };
   },
 
   methods: {
-    setLocation(newLocation) {
+    setAddress(address) {
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${this.key}
+`)
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          const latlng = data.results[0].geometry.location;
+          const newLoc = {
+            id: (latlng.lat + latlng.lng).toString(),
+            center: { lat: latlng.lat, lng: latlng.lng },
+          };
+
+          const newCenter = { lat: latlng.lat, lng: latlng.lng };
+
+          this.locations = [...this.locations, newLoc];
+          this.center = newCenter;
+          console.log("locations array: " + this.locations);
+          console.log("map center: " + this.center);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    currentLocation(newLocation) {
       // this would not work, in order for Vue to know your data has been updated, especially when the data is an object
       // a change on the reference that this object points to needs to happen
       // simply setting the properties within the object to new values would not trigger the change
       // this.location.lat = newLocation.lat;
       // this.location.lng = newLocation.lng;
 
-      const newLoc = { lat: newLocation.lat, lng: newLocation.lng };
-      this.location = newLoc;
-      console.log(this.location.lat);
-      console.log(this.location.lng);
+      const newLoc = {
+        id: (newLocation.lat + newLocation.lng).toString(),
+        center: { lat: newLocation.lat, lng: newLocation.lng },
+      };
+
+      const newCenter = { lat: newLocation.lat, lng: newLocation.lng };
+
+      this.locations = [...this.locations, newLoc];
+      this.center = newCenter;
+
+      console.log("locations array: " + this.locations);
+      console.log("map center: " + this.center);
+
+      // const newLoc = { lat: newLocation.lat, lng: newLocation.lng };
+      // this.location = newLoc;
+
+      // console.log(this.location.lat);
+      // console.log(this.location.lng);
     },
   },
 };
