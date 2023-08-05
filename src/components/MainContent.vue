@@ -23,5 +23,6 @@ export default {
   padding: 2rem;
 
   display: flex;
+  justify-content: space-between;
 }
 </style>

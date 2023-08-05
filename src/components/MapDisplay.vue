@@ -21,23 +21,23 @@ export default {
     return {};
   },
 
-  mounted() {
-    console.log("component is mounted!");
-    console.log(this.locations);
-    console.log(this.center);
-  },
+  // mounted() {
+  //   console.log("component is mounted!");
+  //   console.log(this.locations);
+  //   console.log(this.center);
+  // },
 
-  updated() {
-    console.log("component is updated!");
-    console.log(this.locations);
-    console.log(this.center);
-  },
+  // updated() {
+  //   console.log("component is updated!");
+  //   console.log(this.locations);
+  //   console.log(this.center);
+  // },
 };
 </script>
 
 <style scoped>
 .map_display {
-  width: 70%;
+  width: 60%;
 }
 
 #map {

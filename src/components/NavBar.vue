@@ -33,19 +33,20 @@ export default {
 
   methods: {
     getAddress() {
-      console.log("getAddress is called!");
+      // console.log("getAddress is called!");
       this.$emit("get-address", this.address);
       this.address = "";
     },
 
     currentLocation() {
-      console.log("currentLocation is called!");
+      // console.log("currentLocation is called!");
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
+          console.log(location);
           this.$emit("current-location", location);
         },
         (error) => {
