@@ -1,49 +1,49 @@
 <template>
   <section class="results">
-    <ul class="list">
-      <li
-        class="list-item"
-        v-for="result in results"
-        :key="result.id"
-        :id="result.id"
-      >
-        <p>Name: {{ result.name }}</p>
-        <p>Lat: {{ result.center.lat }}, Lng: {{ result.center.lng }}</p>
-      </li>
-    </ul>
-    <div class="list-control">
-      <div class="list-pagination">
-        <button id="button-prev" type="button" @click="prevPage()">
-          Prev.
-        </button>
-        <button id="button-next" type="button" @click="nextPage()">Next</button>
-      </div>
-      <p class="page-info">{{ page }} / {{ totalPages }}</p>
-    </div>
+    <component :is="activeComponent"></component>
+    <button
+      v-if="activeComponent === 'all-results'"
+      id="button-component"
+      type="button"
+      @click.prevent="switchComponent('selected-results')"
+    >
+      View Selected
+    </button>
+    <button
+      v-else
+      id="button-component"
+      type="button"
+      @click.prevent="switchComponent('all-results')"
+    >
+      View All
+    </button>
   </section>
 </template>
 
 <script>
+import AllResults from "./AllResults.vue";
+import SelectedResults from "./SelectedResults.vue";
 export default {
-  inject: ["results", "page", "totalPages", "prevPage", "nextPage"],
-  emits: ["prev-page", "next-page"],
+  components: {
+    AllResults,
+    SelectedResults,
+  },
 
   data() {
-    return {};
+    return {
+      activeComponent: "all-results",
+    };
   },
 
   methods: {
-    // prevPage() {
-    //   console.log('Click the "prev" button');
-    // },
-    // nextPage() {
-    //   console.log('Click the "next" button');
-    // },
+    switchComponent(component) {
+      this.activeComponent = component;
+    },
   },
 };
 </script>
 
-<style scoped>
+<style>
 .results {
   width: 35%;
 
@@ -51,6 +51,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  row-gap: 2rem;
 }
 
 .list {
@@ -69,8 +70,61 @@ export default {
   width: 100%;
 
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-item-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.list-item-control {
+  display: flex;
+}
+
+.list-item-icon {
+  color: white;
+  border: 1px solid red;
+  cursor: pointer;
+}
+.list-item-icon-selected {
+  color: red;
+  cursor: pointer;
+}
+
+.list-control {
+  width: 100%;
+  display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  row-gap: 1rem;
+}
+
+.list-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.page-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.page-list li {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+li.page-selected {
+  color: red;
+  text-decoration: none;
 }
 </style>

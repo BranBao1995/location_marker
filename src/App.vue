@@ -21,120 +21,12 @@ export default {
     return {
       locations: [
         { id: "0", name: "Initial Location", center: { lat: 0, lng: 0 } },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
-        {
-          id: Math.random(),
-          name: "address" + Math.random().toFixed(6).toString(),
-          center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-        },
       ],
       center: { lat: 0, lng: 0 },
-      page: 1,
+      allViewPage: 1,
+      selectedViewPage: 1,
+      selectedLocationsIds: [],
+      selectedLocations: [],
       key: process.env.VUE_APP_GOOGLE_MAP_API_KEY,
     };
   },
@@ -143,14 +35,29 @@ export default {
     return {
       // need to call computed() and wrap your data in it so that the child component injecting this will react to changes
       locations: computed(() => this.locations),
+      // selectedLocations: computed(() => this.selectedLocations),
       center: computed(() => this.center),
-      page: computed(() => this.page),
+      allViewPage: computed(() => this.allViewPage),
+      selectedViewPage: computed(() => this.selectedViewPage),
       results: computed(() =>
-        this.locations.slice(this.page * 5 - 5, this.page * 5)
+        this.locations.slice(this.allViewPage * 5 - 5, this.allViewPage * 5)
       ),
+      selectedResults: computed(() =>
+        this.selectedLocations.slice(
+          this.selectedViewPage * 5 - 5,
+          this.selectedViewPage * 5
+        )
+      ),
+      selectedLocationsIds: computed(() => this.selectedLocationsIds),
+
       totalPages: computed(() => Math.ceil(this.locations.length / 5)),
+      totalSelectedPages: computed(() =>
+        Math.ceil(this.selectedLocations.length / 5)
+      ),
       prevPage: this.previous,
       nextPage: this.next,
+      goToPage: this.goTo,
+      sendSelectedId: this.addSelectedLocationId,
       apiKey: computed(() => this.key),
     };
   },
@@ -165,7 +72,6 @@ export default {
           }
         })
         .then((data) => {
-          console.log(data);
           const latlng = data.results[0].geometry.location;
           const checkId = (latlng.lat + latlng.lng).toFixed(4).toString();
           const newLoc = {
@@ -188,8 +94,6 @@ export default {
             // otherwise just update the center
             this.center = newCenter;
           }
-          console.log("new locations array:");
-          console.log(this.locations);
         })
         .catch((error) => {
           console.log(error);
@@ -221,7 +125,6 @@ export default {
             }
           })
           .then((data) => {
-            // console.log(data);
             const newLoc = {
               id: checkId,
               name: data.results[0].formatted_address,
@@ -229,29 +132,70 @@ export default {
             };
             this.locations = [...this.locations, newLoc];
             this.center = newCenter;
-            console.log("new locations array:");
-            console.log(this.locations);
           });
       } else {
         this.center = newCenter;
-        console.log("new locations array:");
-        console.log(this.locations);
       }
     },
 
-    previous() {
-      if (this.page !== 1) {
-        this.page = this.page - 1;
-        console.log(this.page);
+    previous(view) {
+      if (view === "all") {
+        if (this.allViewPage !== 1) {
+          this.allViewPage = this.allViewPage - 1;
+        } else {
+          this.selectedViewPage = this.selectedViewPage - 1;
+        }
       }
     },
 
-    next() {
-      if (this.page < Math.ceil(this.locations.length / 5)) {
-        this.page = this.page + 1;
-        console.log(this.page);
+    next(view) {
+      if (view === "all") {
+        if (this.allViewPage < Math.ceil(this.locations.length / 5)) {
+          this.allViewPage = this.allViewPage + 1;
+        }
+      } else {
+        this.selectedViewPage = this.selectedViewPage + 1;
       }
     },
+
+    goTo(page, view) {
+      if (view === "all") {
+        this.allViewPage = page;
+      } else {
+        this.selectedViewPage = page;
+      }
+    },
+
+    addSelectedLocationId(locationId) {
+      if (this.selectedLocationsIds.includes(locationId)) {
+        const index = this.selectedLocationsIds.findIndex(
+          (id) => id === locationId
+        );
+        this.selectedLocationsIds.splice(index, 1);
+        this.selectedLocations = this.locations.filter((location) => {
+          return this.selectedLocationsIds.includes(location.id);
+        });
+      } else {
+        this.selectedLocationsIds.push(locationId);
+        this.selectedLocations = this.locations.filter((location) => {
+          return this.selectedLocationsIds.includes(location.id);
+        });
+      }
+      // console.log("location Ids that are selected.");
+      // console.log(this.selectedLocationsIds);
+      // console.log("locations that are selected");
+      // console.log(this.selectedLocations);
+    },
+  },
+
+  mounted() {
+    for (let i = 0; i < 100; i++) {
+      this.locations.push({
+        id: Math.random(),
+        name: "address" + Math.random().toFixed(6).toString(),
+        center: { lat: Math.random() * 101, lng: Math.random() * 101 },
+      });
+    }
   },
 };
 </script>
