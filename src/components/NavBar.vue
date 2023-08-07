@@ -62,7 +62,8 @@ export default {
 <style scoped>
 .navbar {
   width: 100%;
-  height: 6rem;
+  padding: 2rem;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,6 +71,8 @@ export default {
 
 .search_form {
   width: 60%;
+  font-size: 2rem;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -77,16 +80,24 @@ export default {
 
 .search_input {
   width: 70%;
-  height: 3rem;
+  height: 4rem;
+  padding: 1rem;
+  border: 1px solid rgb(69, 69, 69);
 }
 
-#search_button {
+.search_form button {
   width: 15%;
-  height: 3rem;
+  height: 4rem;
+  padding: 1rem;
+
+  font-size: 1.3rem;
+  background: none;
+  border: 1px solid rgb(69, 69, 69);
+
+  cursor: pointer;
 }
 
-#current_button {
-  width: 15%;
-  height: 3rem;
+.search_form button:hover {
+  background: rgb(173, 172, 172);
 }
 </style>

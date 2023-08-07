@@ -23,24 +23,9 @@
       </div>
     </li>
   </ul>
-  <div class="list-control">
+  <div class="list-bottom">
     <div class="list-pagination">
-      <button
-        v-if="totalPages !== 1"
-        id="button-first"
-        @click.prevent="goToPage(1, 'all')"
-      >
-        First
-      </button>
-      <button
-        v-if="totalPages !== 1"
-        id="button-prev"
-        type="button"
-        @click="prevPage('all')"
-      >
-        Prev.
-      </button>
-      <ul v-if="totalPages !== 1" class="page-list">
+      <ul v-if="totalPages !== 1" class="page-numbers">
         <li
           v-if="allViewPage - 5 >= 1"
           @click="goToPage(allViewPage - 5, 'all')"
@@ -103,6 +88,23 @@
           {{ allViewPage + 5 }}
         </li>
       </ul>
+    </div>
+    <div class="pagination-buttons">
+      <button
+        v-if="totalPages !== 1"
+        id="button-first"
+        @click.prevent="goToPage(1, 'all')"
+      >
+        First
+      </button>
+      <button
+        v-if="totalPages !== 1"
+        id="button-prev"
+        type="button"
+        @click="prevPage('all')"
+      >
+        Prev.
+      </button>
       <button
         v-if="totalPages !== 1"
         id="button-next"

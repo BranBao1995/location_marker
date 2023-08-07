@@ -21,6 +21,21 @@ export default {
     return {
       locations: [
         { id: "0", name: "Initial Location", center: { lat: 0, lng: 0 } },
+        { id: "1", name: "Second Location", center: { lat: 10, lng: 100 } },
+        { id: "2", name: "Third Location", center: { lat: -10, lng: -100 } },
+        { id: "3", name: "Fourth Location", center: { lat: 20, lng: 200 } },
+        { id: "4", name: "Fifth Location", center: { lat: -20, lng: -200 } },
+        { id: "5", name: "Sixth Location", center: { lat: 30, lng: 300 } },
+        { id: "6", name: "Seventh Location", center: { lat: -40, lng: -130 } },
+        { id: "7", name: "Eighth Location", center: { lat: 55, lng: -87 } },
+        { id: "8", name: "Ninth Location", center: { lat: -99, lng: 175 } },
+        { id: "9", name: "Tenth Location", center: { lat: 160, lng: -180 } },
+        { id: "10", name: "Eleventh Location", center: { lat: -230, lng: 32 } },
+        {
+          id: "11",
+          name: "Twelveth Location",
+          center: { lat: 330, lng: -250 },
+        },
       ],
       center: { lat: 0, lng: 0 },
       allViewPage: 1,
@@ -35,7 +50,7 @@ export default {
     return {
       // need to call computed() and wrap your data in it so that the child component injecting this will react to changes
       locations: computed(() => this.locations),
-      // selectedLocations: computed(() => this.selectedLocations),
+      selectedLocations: computed(() => this.selectedLocations),
       center: computed(() => this.center),
       allViewPage: computed(() => this.allViewPage),
       selectedViewPage: computed(() => this.selectedViewPage),
@@ -50,14 +65,19 @@ export default {
       ),
       selectedLocationsIds: computed(() => this.selectedLocationsIds),
 
-      totalPages: computed(() => Math.ceil(this.locations.length / 5)),
+      totalPages: computed(() =>
+        this.locations.length > 0 ? Math.ceil(this.locations.length / 5) : 1
+      ),
       totalSelectedPages: computed(() =>
-        Math.ceil(this.selectedLocations.length / 5)
+        this.selectedLocations.length > 0
+          ? Math.ceil(this.selectedLocations.length / 5)
+          : 1
       ),
       prevPage: this.previous,
       nextPage: this.next,
       goToPage: this.goTo,
       sendSelectedId: this.addSelectedLocationId,
+      deleteLocations: this.delete,
       apiKey: computed(() => this.key),
     };
   },
@@ -142,7 +162,9 @@ export default {
       if (view === "all") {
         if (this.allViewPage !== 1) {
           this.allViewPage = this.allViewPage - 1;
-        } else {
+        }
+      } else {
+        if (this.selectedViewPage !== 1) {
           this.selectedViewPage = this.selectedViewPage - 1;
         }
       }
@@ -154,7 +176,11 @@ export default {
           this.allViewPage = this.allViewPage + 1;
         }
       } else {
-        this.selectedViewPage = this.selectedViewPage + 1;
+        if (
+          this.selectedViewPage < Math.ceil(this.selectedLocations.length / 5)
+        ) {
+          this.selectedViewPage = this.selectedViewPage + 1;
+        }
       }
     },
 
@@ -175,16 +201,27 @@ export default {
         this.selectedLocations = this.locations.filter((location) => {
           return this.selectedLocationsIds.includes(location.id);
         });
+        this.selectedViewPage =
+          this.selectedLocations.length > 0
+            ? Math.ceil(this.selectedLocations.length / 5)
+            : 1;
       } else {
         this.selectedLocationsIds.push(locationId);
         this.selectedLocations = this.locations.filter((location) => {
           return this.selectedLocationsIds.includes(location.id);
         });
       }
-      // console.log("location Ids that are selected.");
-      // console.log(this.selectedLocationsIds);
-      // console.log("locations that are selected");
-      // console.log(this.selectedLocations);
+    },
+
+    delete() {
+      this.locations = this.locations.filter((location) => {
+        return !this.selectedLocationsIds.includes(location.id);
+      });
+      const arr = [];
+      this.selectedLocations = arr;
+      this.selectedLocationsIds = arr;
+      this.allViewPage = 1;
+      this.selectedViewPage = 1;
     },
   },
 

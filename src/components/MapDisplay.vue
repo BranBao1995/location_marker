@@ -1,6 +1,6 @@
 <template>
   <section class="map_display">
-    <GoogleMap id="map" :api-key="apiKey" :center="center" :zoom="15">
+    <GoogleMap id="map" :api-key="apiKey" :center="center" :zoom="5">
       <Marker
         v-for="location in locations"
         :key="location.id"

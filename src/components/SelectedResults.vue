@@ -1,10 +1,12 @@
 <template>
   <ul class="list">
+    <p v-if="selectedResults.length === 0">No selections yet</p>
     <li
-      class="list-item"
+      v-else
       v-for="result in selectedResults"
       :key="result.id"
       :id="result.id"
+      class="list-item"
     >
       <div class="list-item-info">
         <p>Name: {{ result.name }}</p>
@@ -23,24 +25,9 @@
       </div>
     </li>
   </ul>
-  <div class="list-control">
+  <div class="list-bottom">
     <div class="list-pagination">
-      <button
-        v-if="totalSelectedPages !== 1"
-        id="button-first"
-        @click.prevent="goToPage(1, 'selected')"
-      >
-        First
-      </button>
-      <button
-        v-if="totalSelectedPages !== 1"
-        id="button-prev"
-        type="button"
-        @click="prevPage('selected')"
-      >
-        Prev.
-      </button>
-      <ul v-if="totalSelectedPages !== 1" class="page-list">
+      <ul v-if="totalSelectedPages !== 1" class="page-numbers">
         <li
           v-if="selectedViewPage - 5 >= 1"
           @click="goToPage(selectedViewPage - 5, 'selected')"
@@ -103,6 +90,23 @@
           {{ selectedViewPage + 5 }}
         </li>
       </ul>
+    </div>
+    <div class="pagination-buttons">
+      <button
+        v-if="totalSelectedPages !== 1"
+        id="button-first"
+        @click.prevent="goToPage(1, 'selected')"
+      >
+        First
+      </button>
+      <button
+        v-if="totalSelectedPages !== 1"
+        id="button-prev"
+        type="button"
+        @click="prevPage('selected')"
+      >
+        Prev.
+      </button>
       <button
         v-if="totalSelectedPages !== 1"
         id="button-next"
