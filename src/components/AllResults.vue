@@ -8,7 +8,7 @@
     >
       <div class="list-item-info">
         <p>Name: {{ result.name }}</p>
-        <p>Lat: {{ result.center.lat }}, Lng: {{ result.center.lng }}</p>
+        <p>Lat: {{ result.position.lat }}, Lng: {{ result.position.lng }}</p>
       </div>
       <div class="list-item-control">
         <font-awesome-icon
@@ -165,10 +165,6 @@ export default {
         this.targetPage = null;
       }
     },
-  },
-
-  mounted() {
-    console.log(this.results);
   },
 };
 </script>

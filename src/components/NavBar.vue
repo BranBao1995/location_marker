@@ -2,6 +2,7 @@
   <section class="navbar">
     <form @submit.prevent="getAddress" class="search_form">
       <input
+        id="auto_complete"
         class="search_input"
         type="text"
         placeholder="Search for a location"
@@ -23,6 +24,7 @@
 
 <script>
 export default {
+  inject: ["apiKey", "loader"],
   emits: ["current-location", "get-address"],
 
   data() {
@@ -32,21 +34,43 @@ export default {
   },
 
   methods: {
+    autoComplete() {
+      this.loader
+        .importLibrary("places")
+        .then(({ Autocomplete }) => {
+          let autocomplete = new Autocomplete(
+            document.getElementById("auto_complete"),
+            {
+              fields: ["formatted_address", "geometry"],
+            }
+          );
+          autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+              document.getElementById("auto_complete").placeholder =
+                "Enter a place";
+            } else {
+              this.address = place.formatted_address;
+            }
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+
     getAddress() {
-      // console.log("getAddress is called!");
       this.$emit("get-address", this.address);
       this.address = "";
     },
 
     currentLocation() {
-      // console.log("currentLocation is called!");
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-          console.log(location);
           this.$emit("current-location", location);
         },
         (error) => {
@@ -55,6 +79,10 @@ export default {
       );
       this.address = "";
     },
+  },
+
+  mounted() {
+    this.autoComplete();
   },
 };
 </script>

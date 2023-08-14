@@ -1,37 +1,62 @@
 <template>
   <section class="map_display">
-    <GoogleMap id="map" :api-key="apiKey" :center="center" :zoom="5">
-      <Marker
-        v-for="location in locations"
-        :key="location.id"
-        :id="location.id"
-        :options="{ position: location.center }"
-      />
-    </GoogleMap>
+    <div id="map"></div>
   </section>
 </template>
 
 <script>
-import { GoogleMap, Marker } from "vue3-google-map";
-
 export default {
-  components: { GoogleMap, Marker },
-  inject: ["locations", "center", "apiKey"],
+  inject: ["loader", "locations", "position", "apiKey"],
+
   data() {
-    return {};
+    return {
+      map: null,
+    };
   },
 
-  // mounted() {
-  //   console.log("component is mounted!");
-  //   console.log(this.locations);
-  //   console.log(this.center);
-  // },
+  watch: {
+    locations() {
+      this.loadMap();
+      this.addMarker();
+    },
+  },
 
-  // updated() {
-  //   console.log("component is updated!");
-  //   console.log(this.locations);
-  //   console.log(this.center);
-  // },
+  methods: {
+    loadMap() {
+      this.loader
+        .importLibrary("maps")
+        .then(({ Map }) => {
+          this.map = new Map(document.getElementById("map"), {
+            zoom: 4,
+            center: this.position,
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+
+    addMarker() {
+      this.loader
+        .importLibrary("marker")
+        .then(({ Marker }) => {
+          this.locations.map((location) => {
+            new Marker({
+              map: this.map,
+              position: location.position,
+            });
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+  },
+
+  mounted() {
+    this.loadMap();
+    this.addMarker();
+  },
 };
 </script>
 

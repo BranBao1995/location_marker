@@ -10,6 +10,7 @@ import NavBar from "./components/NavBar.vue";
 import MainContent from "./components/MainContent.vue";
 
 import { computed } from "vue";
+import { Loader } from "@googlemaps/js-api-loader";
 
 export default {
   components: {
@@ -19,72 +20,76 @@ export default {
 
   data() {
     return {
+      loader: new Loader({
+        apiKey: process.env.VUE_APP_GOOGLE_MAP_API_KEY,
+        version: "weekly",
+        libraries: ["places"],
+      }),
+
       locations: [
-        { id: "0", name: "Initial Location", center: { lat: 0, lng: 0 } },
-        { id: "1", name: "Second Location", center: { lat: 10, lng: 100 } },
-        { id: "2", name: "Third Location", center: { lat: -10, lng: -100 } },
-        { id: "3", name: "Fourth Location", center: { lat: 20, lng: 200 } },
-        { id: "4", name: "Fifth Location", center: { lat: -20, lng: -200 } },
-        { id: "5", name: "Sixth Location", center: { lat: 30, lng: 300 } },
-        { id: "6", name: "Seventh Location", center: { lat: -40, lng: -130 } },
-        { id: "7", name: "Eighth Location", center: { lat: 55, lng: -87 } },
-        { id: "8", name: "Ninth Location", center: { lat: -99, lng: 175 } },
-        { id: "9", name: "Tenth Location", center: { lat: 160, lng: -180 } },
-        { id: "10", name: "Eleventh Location", center: { lat: -230, lng: 32 } },
-        {
-          id: "11",
-          name: "Twelveth Location",
-          center: { lat: 330, lng: -250 },
-        },
+        { id: "0", name: "Initial Location", position: { lat: 0, lng: 0 } },
       ],
-      center: { lat: 0, lng: 0 },
+      position: { lat: 0, lng: 0 },
       allViewPage: 1,
       selectedViewPage: 1,
       selectedLocationsIds: [],
       selectedLocations: [],
-      key: process.env.VUE_APP_GOOGLE_MAP_API_KEY,
+      apiKey: process.env.VUE_APP_GOOGLE_MAP_API_KEY,
     };
   },
 
   provide() {
     return {
       // need to call computed() and wrap your data in it so that the child component injecting this will react to changes
-      locations: computed(() => this.locations),
-      selectedLocations: computed(() => this.selectedLocations),
-      center: computed(() => this.center),
-      allViewPage: computed(() => this.allViewPage),
-      selectedViewPage: computed(() => this.selectedViewPage),
+
+      loader: computed(() => this.loader),
+
+      locations: computed(() => this.locations), // an array containing all locations
+
+      selectedLocations: computed(() => this.selectedLocations), // an array containing locations that have been selected
+
+      position: computed(() => this.position), // map center
+
+      allViewPage: computed(() => this.allViewPage), // current page number when the 'all' view is selected
+
+      selectedViewPage: computed(() => this.selectedViewPage), // current page number when the 'selected' view is selected
+
       results: computed(() =>
         this.locations.slice(this.allViewPage * 5 - 5, this.allViewPage * 5)
-      ),
+      ), // locations results that are displayed are limited to just 5 results per page for 'all' view
+
       selectedResults: computed(() =>
         this.selectedLocations.slice(
           this.selectedViewPage * 5 - 5,
           this.selectedViewPage * 5
         )
-      ),
-      selectedLocationsIds: computed(() => this.selectedLocationsIds),
+      ), // locations results that are displayed are limited to just 5 results per page for 'selected' view
+
+      selectedLocationsIds: computed(() => this.selectedLocationsIds), // an array containing the ids of selected locations
 
       totalPages: computed(() =>
         this.locations.length > 0 ? Math.ceil(this.locations.length / 5) : 1
-      ),
+      ), // total number of pages in the 'all' view
+
       totalSelectedPages: computed(() =>
         this.selectedLocations.length > 0
           ? Math.ceil(this.selectedLocations.length / 5)
           : 1
-      ),
+      ), // total number of pages in the 'selected' view
+
+      apiKey: this.apiKey,
+
       prevPage: this.previous,
       nextPage: this.next,
       goToPage: this.goTo,
       sendSelectedId: this.addSelectedLocationId,
       deleteLocations: this.delete,
-      apiKey: computed(() => this.key),
     };
   },
 
   methods: {
     setAddress(address) {
-      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${this.key}
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${this.apiKey}
 `)
         .then((response) => {
           if (response.ok) {
@@ -97,9 +102,9 @@ export default {
           const newLoc = {
             id: checkId,
             name: data.results[0].formatted_address,
-            center: { lat: latlng.lat, lng: latlng.lng },
+            position: { lat: latlng.lat, lng: latlng.lng },
           };
-          const newCenter = { lat: latlng.lat, lng: latlng.lng };
+          const newPosition = { lat: latlng.lat, lng: latlng.lng };
 
           // need to check if this location already exists in the array
           const locationExists = this.locations.find(
@@ -109,10 +114,10 @@ export default {
           if (!locationExists) {
             // if the location doesn't exists, add it to the array
             this.locations = [...this.locations, newLoc];
-            this.center = newCenter;
+            this.position = newPosition;
           } else {
             // otherwise just update the center
-            this.center = newCenter;
+            this.position = newPosition;
           }
         })
         .catch((error) => {
@@ -129,7 +134,7 @@ export default {
 
       const checkId = (newLocation.lat + newLocation.lng).toFixed(4).toString();
 
-      const newCenter = { lat: newLocation.lat, lng: newLocation.lng };
+      const newPosition = { lat: newLocation.lat, lng: newLocation.lng };
 
       const locationExists = this.locations.find(
         (location) => location.id === checkId
@@ -137,7 +142,7 @@ export default {
 
       if (!locationExists) {
         fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLocation.lat},${newLocation.lng}&key=${this.key}`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLocation.lat},${newLocation.lng}&key=${this.apiKey}`
         )
           .then((response) => {
             if (response.ok) {
@@ -148,13 +153,13 @@ export default {
             const newLoc = {
               id: checkId,
               name: data.results[0].formatted_address,
-              center: { lat: newLocation.lat, lng: newLocation.lng },
+              position: { lat: newLocation.lat, lng: newLocation.lng },
             };
             this.locations = [...this.locations, newLoc];
-            this.center = newCenter;
+            this.position = newPosition;
           });
       } else {
-        this.center = newCenter;
+        this.position = newPosition;
       }
     },
 
@@ -225,15 +230,15 @@ export default {
     },
   },
 
-  mounted() {
-    for (let i = 0; i < 100; i++) {
-      this.locations.push({
-        id: Math.random(),
-        name: "address" + Math.random().toFixed(6).toString(),
-        center: { lat: Math.random() * 101, lng: Math.random() * 101 },
-      });
-    }
-  },
+  // mounted() {
+  //   for (let i = 0; i < 100; i++) {
+  //     this.locations.push({
+  //       id: Math.random(),
+  //       name: "address" + Math.random().toFixed(6).toString(),
+  //       center: { lat: Math.random() * 101, lng: Math.random() * 101 },
+  //     });
+  //   }
+  // },
 };
 </script>
 

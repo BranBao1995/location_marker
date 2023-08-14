@@ -13,10 +13,10 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@googlemaps/js-api-loader": "^1.16.2",
     "core-js": "^3.6.5",
     "serve": "^14.2.0",
-    "vue": "^3.0.0",
-    "vue3-google-map": "^0.15.0"
+    "vue": "^3.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.8",
